@@ -214,9 +214,10 @@ def remove_emblem(path):
     os.system("xte 'keydown Control_L' 'key R' 'keyup Control_L'")
 
 
-class EmblemsMenu(GObject.GObject, FileManager.MenuProvider):
+class NewEmblemsMenuProvider(GObject.GObject, FileManager.MenuProvider):
     extra_emblems = None
     emblem_names = {}
+
     def __init__(self):
 
         # TODO: Is there a way to ask Nautilus for the list of all
@@ -236,7 +237,7 @@ class EmblemsMenu(GObject.GObject, FileManager.MenuProvider):
 
     def get_file_items(self, window, files):
         top_menuitem = FileManager.MenuItem(
-            name='EmblemsMenu::Gtk-emblems-top',
+            name='NewEmblemsMenuProvider::Gtk-emblems-top',
             label=_('Emblems'),
             tip=_('Set and unset emblems'))
         submenu = FileManager.Menu()
@@ -247,7 +248,7 @@ class EmblemsMenu(GObject.GObject, FileManager.MenuProvider):
             if not emblems:
                 continue
             sub_menuitem = FileManager.MenuItem(
-                name='EmblemsMenu::Gtk-emblems-' + sub,
+                name='NewEmblemsMenuProvider::Gtk-emblems-' + sub,
                 label=sub,
                 tip=sub)
             emblems_menu = FileManager.Menu()
@@ -259,7 +260,7 @@ class EmblemsMenu(GObject.GObject, FileManager.MenuProvider):
                 # TODO: How do we get the emblem icon image, and how
                 # do we attach it to the menu as item?
                 emblem_item = FileManager.MenuItem(
-                    name='EmblemsMenu::Gtk-emblems-sub-' + sub + '-' + e,
+                    name='NewEmblemsMenuProvider::Gtk-emblems-sub-' + sub + '-' + e,
                     label=display_name,
                     tip=desplay_name)
                 emblem_item.connect('activate',
@@ -270,7 +271,7 @@ class EmblemsMenu(GObject.GObject, FileManager.MenuProvider):
                 emblems_menu.append_item(emblem_item)
 
         sub_menuitem_clear = FileManager.MenuItem(
-            name='EmblemsMenu::Gtk-emblems-clear',
+            name='NewEmblemsMenuProvider::Gtk-emblems-clear',
             label='Clear',
             tip='Remove the emblem')
         sub_menuitem_clear.connect('activate',
@@ -280,7 +281,7 @@ class EmblemsMenu(GObject.GObject, FileManager.MenuProvider):
                                    window)
         submenu.append_item(sub_menuitem_clear)
         sub_menuitem_about = FileManager.MenuItem(
-            name='EmblemsMenu::Gtk-emblems-about',
+            name='NewEmblemsMenuProvider::Gtk-emblems-about',
             label=_('About'),
             tip=_('About'))
         sub_menuitem_about.connect('activate', self.about, window)
