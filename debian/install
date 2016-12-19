@@ -1,0 +1,2 @@
+src/nautilus-emblems.py /usr/share/nautilus-python/extensions
+data/nautilus-emblems.svg /usr/share/icons/gnome/scalable/apps
