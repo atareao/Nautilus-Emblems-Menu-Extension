@@ -1,5 +1,5 @@
-nautilus-newemblems (0.1.0-0extras16.04.0) xenial; urgency=medium
+nautilus-newemblems (0.1.0-0extras16.04.1) xenial; urgency=medium
 
   * Fixed a bug
 
- -- Lorenzo Carbonell <lorenzo.carbonell.cerezo@gmail.com>  Mon, 19 Dec 2016 20:21:39 +0100
+ -- Lorenzo Carbonell <lorenzo.carbonell.cerezo@gmail.com>  Mon, 19 Dec 2016 20:28:17 +0100

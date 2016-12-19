@@ -1,0 +1,17 @@
+Source: nautilus-newemblems
+Section: utils
+Priority: extra
+Maintainer: Lorenzo Carbonell Cerezo <lorenzo.carbonell.cerezo@gmail.com>
+Build-Depends: debhelper (>= 9)
+Standards-Version: 3.9.4
+Homepage: http://www.atareao.es
+
+Package: nautilus-newemblems
+Architecture: all
+Depends: ${misc:Depends}, ${python:Depends},
+	python,
+	python-gi,
+	gir1.2-nautilus-3.0,
+	python-nautilus,
+Description: An extension for Nautilus to set/modify emblems folder
+ This is a simple Nautilus extension which adds a context menu to files and directories which lets you set/modify emblems its emblems.

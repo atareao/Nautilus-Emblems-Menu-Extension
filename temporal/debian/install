@@ -1,0 +1,2 @@
+src/nautilus-newemblems.py /usr/share/nautilus-python/extensions
+data/nautilus-newemblems.svg /usr/share/icons/gnome/scalable/apps
