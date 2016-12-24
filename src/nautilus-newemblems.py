@@ -28,6 +28,7 @@ except Exception as e:
     print(e)
     exit(-1)
 import os
+import glob
 import subprocess
 import shlex
 from threading import Thread
@@ -190,7 +191,8 @@ class Progreso(Gtk.Dialog, IdleObject):
         self.label.set_text(_('Sending: %s') % element)
 
 
-def add_emblem(path, emblem):
+def add_emblem(fileinfo, emblem):
+    '''
     p = subprocess.Popen(["gvfs-info", "-a", "metadata::emblems", path],
                          stdout=subprocess.PIPE)
     out, err = p.communicate()
@@ -204,14 +206,26 @@ def add_emblem(path, emblem):
     p = subprocess.Popen(["gvfs-set-attribute", "-t", "stringv", path,
                           "metadata::emblems"] + emblems)
     p.communicate()
-    os.system("xte 'keydown Control_L' 'key R' 'keyup Control_L'")
+    '''
+    fileinfo.add_emblem(emblem)
 
 
-def remove_emblem(path):
+def remove_emblem(fileinfo):
+    '''
     p = subprocess.Popen(["gvfs-set-attribute", "-t", "unset", path,
                           "metadata::emblems"])
     p.communicate()
-    os.system("xte 'keydown Control_L' 'key R' 'keyup Control_L'")
+    '''
+    fileinfo.invalidate_extension_info()
+
+
+def get_files(files_in):
+    files = []
+    for file_in in files_in:
+        file_in = unquote_plus(file_in.get_uri()[7:])
+        if os.path.exists(file_in):
+            files.append(file_in)
+    return files
 
 
 class NewEmblemsMenuProvider(GObject.GObject, FileManager.MenuProvider):
@@ -222,8 +236,8 @@ class NewEmblemsMenuProvider(GObject.GObject, FileManager.MenuProvider):
 
         # TODO: Is there a way to ask Nautilus for the list of all
         # possible emblems?
-        if EmblemsMenu.extra_emblems is None:
-            EmblemsMenu.extra_emblems = []
+        if NewEmblemsMenuProvider.extra_emblems is None:
+            NewEmblemsMenuProvider.extra_emblems = []
             usericons = os.path.expanduser(USER_EMBLEMS_PATH)
             for f in glob.glob(usericons + "/*.icon"):
                 for row in open(f):
@@ -231,9 +245,9 @@ class NewEmblemsMenuProvider(GObject.GObject, FileManager.MenuProvider):
                         name = row[len("DisplayName="):].strip()
                         n = os.path.basename(f)
                         n = os.path.splitext(n)[0]
-                        EmblemsMenu.emblem_names[n] = name
-                        EmblemsMenu.extra_emblems.append(n)
-            EmblemsMenu.extra_emblems.sort()
+                        NewEmblemsMenuProvider.emblem_names[n] = name
+                        NewEmblemsMenuProvider.extra_emblems.append(n)
+            NewEmblemsMenuProvider.extra_emblems.sort()
 
     def get_file_items(self, window, files):
         top_menuitem = FileManager.MenuItem(
@@ -244,7 +258,7 @@ class NewEmblemsMenuProvider(GObject.GObject, FileManager.MenuProvider):
         top_menuitem.set_submenu(submenu)
 
         for sub, emblems in [("Standard", free_desktop_emblems),
-                             ("User", EmblemsMenu.extra_emblems)]:
+                             ("User", NewEmblemsMenuProvider.extra_emblems)]:
             if not emblems:
                 continue
             sub_menuitem = FileManager.MenuItem(
@@ -253,20 +267,20 @@ class NewEmblemsMenuProvider(GObject.GObject, FileManager.MenuProvider):
                 tip=sub)
             emblems_menu = FileManager.Menu()
             sub_menuitem.set_submenu(emblems_menu)
-            submenu.append_item(sub_item)
+            submenu.append_item(sub_menuitem)
             for e in emblems:
-                display_name = EmblemsMenu.emblem_names.get(
+                display_name = NewEmblemsMenuProvider.emblem_names.get(
                     e, e[len("emblem-"):])
                 # TODO: How do we get the emblem icon image, and how
                 # do we attach it to the menu as item?
                 emblem_item = FileManager.MenuItem(
                     name='NewEmblemsMenuProvider::Gtk-emblems-sub-' + sub + '-' + e,
                     label=display_name,
-                    tip=desplay_name)
+                    tip=display_name)
                 emblem_item.connect('activate',
                                     self.emblemize,
                                     files,
-                                    emblem,
+                                    e,
                                     window)
                 emblems_menu.append_item(emblem_item)
 
@@ -287,7 +301,7 @@ class NewEmblemsMenuProvider(GObject.GObject, FileManager.MenuProvider):
         sub_menuitem_about.connect('activate', self.about, window)
         submenu.append_item(sub_menuitem_about)
 
-        return menu_item,
+        return top_menuitem,
 
     def emblemize(self, menu, files, emblem, window):
         diib = DoItInBackground(files, emblem)
@@ -298,9 +312,13 @@ class NewEmblemsMenuProvider(GObject.GObject, FileManager.MenuProvider):
         diib.connect('start_one', progreso.set_element)
         diib.connect('end_one', progreso.increase)
         diib.connect('ended', progreso.close)
+        diib.connect('ended', self.update_filemanager)
         progreso.connect('i-want-stop', diib.stop)
         diib.start()
         progreso.run()
+
+    def update_filemanager(self, *args):
+        os.system("xte 'keydown Control_L' 'key R' 'keyup Control_L'")
 
     def about(self, widget, window):
         ad = Gtk.AboutDialog(parent=window)
@@ -332,3 +350,17 @@ this program. If not, see <http://www.gnu.org/licenses/>.
         ad.set_logo_icon_name(APP)
         ad.run()
         ad.destroy()
+
+if __name__ == '__main__':
+    files = ['/home/lorenzo/Escritorio/blender']
+    diib = DoItInBackground(files, 'emblem-important')
+    progreso = Progreso(_('Set emblems'),
+                        None,
+                        len(files))
+    diib.connect('started', progreso.set_max_value)
+    diib.connect('start_one', progreso.set_element)
+    diib.connect('end_one', progreso.increase)
+    diib.connect('ended', progreso.close)
+    progreso.connect('i-want-stop', diib.stop)
+    diib.start()
+    progreso.run()

@@ -1,5 +1,11 @@
-nautilus-newemblems (0.1.0-0extras16.04.1) xenial; urgency=medium
+nautilus-newemblems (0.2.0-0extras16.04.0) xenial; urgency=medium
+
+  * Using add_emblem
+
+ -- Lorenzo Carbonell <lorenzo.carbonell.cerezo@gmail.com>  Sat, 24 Dec 2016 08:49:40 +0100
+
+nautilus-newemblems (0.1.1-0extras16.04.5) xenial; urgency=medium
 
   * Fixed a bug
 
- -- Lorenzo Carbonell <lorenzo.carbonell.cerezo@gmail.com>  Mon, 19 Dec 2016 20:28:17 +0100
+ -- Lorenzo Carbonell <lorenzo.carbonell.cerezo@gmail.com>  Tue, 20 Dec 2016 08:46:59 +0100
